@@ -10,7 +10,7 @@ from dataclasses import dataclass
 SYSTEM_PROMPT = """Jesteś koordynatorem sztabu poszukiwawczo-ratowniczego (OSP / GOPR / Policja).
 Analizujesz surowe meldunki terenowe i zeznania świadków dotyczące osoby zaginionej.
 Zwróć WYŁĄCZNIE zwarty JSON (w jednej linii, bez komentarzy i markdown) o strukturze:
-{"profil_zaginionego":{"osoba":"imię/wiek/cechy","ubior":"pełny ubiór z meldunków","zdrowie":"choroby, leki, urazy","kierunek":"ostatni pewny kierunek"},"klastry_sladow":[{"tytul":"krótka nazwa tropu","frazy":["dokładny cytat ubioru/cechy z M1","synonim z M2"],"ids":["M1","M2"],"uzasadnienie":"dlaczego to ten sam trop"}],"sprzecznosci":[{"ids":["M1","M3"],"typ":"KONFLIKT CZASU|KONFLIKT KIERUNKU|FAŁSZYWY TROP","opis":"konkretna rozbieżność godzin lub miejsc","waga":"wysoka"}],"sektory":[{"code":"A2","priority":1,"reason":"krótkie uzasadnienie"}],"pytania_do_swiadkow":["max 3 krótkie pytania do dyspozytora"]}
+{"profil_zaginionego":{"osoba":"imię/wiek/cechy","ubior":"pełny ubiór z meldunków","zdrowie":"choroby, leki, urazy","kierunek":"ostatni pewny kierunek"},"klastry_sladow":[{"tytul":"krótka nazwa tropu","frazy":["dokładny cytat ubioru/cechy z M1","synonim z M2"],"ids":["M1","M2"],"uzasadnienie":"dlaczego to ten sam trop"}],"sprzecznosci":[{"ids":["M1","M3"],"typ":"KONFLIKT CZASU|KONFLIKT KIERUNKU|FAŁSZYWY TROP","opis":"konkretna rozbieżność godzin lub miejsc","waga":"wysoka"}],"pytania_do_swiadkow":["pytanie 1 do dyspozytora","pytanie 2","pytanie 3"],"sektory":[{"code":"A2","priority":1,"reason":"krótkie uzasadnienie"}]}
 Zasady:
 1. W `klastry_sladow` ZAWSZE łącz w pary synonimy z różnych meldunków opisujące tę samą część ubioru, przedmiot lub uraz (np. różnice odcieni kolorów, fasonów kurtek/bluz/butów/plecaków lub objawów typu utykanie ↔ uraz). Podawaj dokładne frazy z tekstu.
 2. Wykrywaj sprzeczne godziny, przeciwne kierunki i fałszywe tropy w `sprzecznosci`.
@@ -77,7 +77,7 @@ def classify_via_llama_http(messages: list[dict], meta: dict, llama_url: str = "
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0.0,
-        "max_tokens": 520,
+        "max_tokens": 680,
     }).encode("utf-8")
 
     t0 = time.perf_counter()

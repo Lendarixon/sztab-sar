@@ -3,181 +3,282 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sztab-SAR — Taktyczny Koordynator Poszukiwań Offline</title>
+<title>Sztab-SAR — Metro UI Taktyczny Koordynator Poszukiwań</title>
 <style>
 :root{
-  --bg:#0b0e14; --surface:#12161f; --surface2:#191f2c; --border:rgba(255,255,255,0.09);
-  --text:#eceff4; --muted:#9aa3b5; --accent:#2f6fe6; --accent2:#5b8ff0;
-  --ok:#2fbf8f; --warn:#f59e0b; --err:#ef4444;
+  --bg:#0c0f14; --surface:#151a23; --tile:#1c2330; --tile2:#232b3b;
+  --line:#2d3748; --text:#ffffff; --muted:#a0aec0;
+  --blue:#0078d4; --blue-dk:#005a9e;
+  --teal:#008272; --red:#c50f1f; --amber:#ca5010; --green:#107c10;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI Variable","Segoe UI",system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f59e0b);display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
-.brand h1{margin:0;font-size:15px;font-weight:600}
+*{box-sizing:border-box;border-radius:0!important}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Segoe UI","Segoe UI Web",system-ui,sans-serif;
+  height:100vh;display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* Metro Command Bar */
+header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:8px 16px;background:#11151d;border-bottom:2px solid var(--blue);flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.metro-mark{
+  width:38px;height:38px;background:var(--red);color:#fff;
+  display:grid;place-items:center;font-weight:700;font-size:14px;letter-spacing:.04em;
+}
+.brand h1{margin:0;font-size:20px;font-weight:300;letter-spacing:-.01em}
+.brand h1 b{font-weight:700}
 .brand .sub{font-size:11.5px;color:var(--muted)}
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-select,button,input,textarea{font:inherit;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12.5px}
-button{cursor:pointer;transition:.15s}
-button:hover{border-color:rgba(255,255,255,0.22)}
-button.primary{background:var(--accent);border-color:var(--accent);font-weight:600}
-button.primary:hover{background:#265ec7}
+.cmd-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+select,button,input,textarea{
+  font:inherit;color:var(--text);background:var(--tile);border:1px solid var(--line);
+  padding:6px 10px;font-size:12.5px;outline:none;
+}
+select:focus,input:focus,textarea:focus{border-color:var(--blue)}
+button{cursor:pointer;font-weight:600;transition:background .12s,border-color .12s}
+button:hover{background:var(--tile2);border-color:#64748b}
+button.primary{background:var(--blue);border-color:var(--blue)}
+button.primary:hover{background:var(--blue-dk)}
 button:disabled{opacity:.55;cursor:wait}
-.pill{font-size:11.5px;padding:4px 9px;border-radius:999px;background:rgba(47,191,143,.14);color:#6ee7b7;border:1px solid rgba(47,191,143,.32)}
-.toggle{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:7px}
-.toggle input{accent-color:var(--accent);margin:0}
 
-main{flex:1;display:grid;grid-template-columns:1.05fr 1.15fr 1.1fr;gap:12px;padding:12px 16px;overflow:hidden;min-height:0}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:11px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.panel-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.panel-head h2{margin:0;font-size:13px;font-weight:600;color:#dbe2ef;text-transform:uppercase;letter-spacing:.04em}
-.panel-body{padding:12px 14px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+.seg-group{display:inline-flex;border:1px solid var(--line);background:var(--tile)}
+.seg-btn{
+  border:none;background:transparent;padding:6px 11px;font-size:12px;font-weight:600;color:var(--muted);
+}
+.seg-btn.active{background:var(--blue);color:#fff}
+.seg-btn.regex.active{background:var(--amber);color:#fff}
 
-.meta-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--muted)}
-.meta-bar b{color:var(--text);font-weight:600}
+/* Live Metro KPI Tiles */
+.kpi-strip{
+  display:grid;grid-template-columns:1.2fr 1.3fr 1fr 1fr 1.1fr;gap:8px;
+  padding:10px 16px 6px;background:var(--bg);
+}
+.kpi-tile{
+  padding:10px 14px;background:var(--tile);border-left:5px solid var(--blue);
+  display:flex;flex-direction:column;justify-content:space-between;min-height:66px;
+}
+.kpi-tile.red{background:#8f0b17;border-left-color:#ff6b6b}
+.kpi-tile.amber{background:#9b3d0c;border-left-color:#fbbf24}
+.kpi-tile.teal{background:#005f54;border-left-color:#2dd4bf}
+.kpi-tile.green{background:#0b5a0b;border-left-color:#4ade80}
+.kpi-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.8);font-weight:600}
+.kpi-val{font-size:21px;font-weight:700;line-height:1.15;margin-top:2px}
+.kpi-sub{font-size:11.5px;color:rgba(255,255,255,.85);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.msg-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:4px}
-.msg-top{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11.5px}
-.msg-id{font-weight:700;color:var(--accent2)}
-.msg-src{color:var(--muted);flex:1}
-.msg-del{background:transparent;border:none;color:var(--muted);padding:0 4px;font-size:14px;line-height:1}
-.msg-del:hover{color:var(--err)}
-.msg-txt{font-size:12.8px;line-height:1.45;color:var(--text)}
+/* 3-Column Metro Panorama */
+main{
+  flex:1;display:grid;grid-template-columns:1.05fr 1.1fr 1.15fr;gap:8px;
+  padding:6px 16px 14px;overflow:hidden;min-height:0;
+}
+.col{
+  background:var(--surface);border:1px solid var(--line);
+  display:flex;flex-direction:column;min-height:0;overflow:hidden;
+}
+.col-head{
+  padding:9px 14px;background:#1a212d;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+.col-head h2{margin:0;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#e2e8f0}
+.col-body{padding:10px 12px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px}
 
-.add-box{border-top:1px solid var(--border);padding:10px 14px;background:rgba(255,255,255,.015);display:flex;flex-direction:column;gap:6px}
-.add-row{display:grid;grid-template-columns:76px 1fr;gap:6px}
-.add-box textarea{width:100%;min-height:54px;resize:vertical}
+/* Col 1: Meldunki with inline highlights */
+.meta-tile{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--tile);
+  border-left:4px solid var(--blue);padding:8px 10px;font-size:12px;color:var(--muted);
+}
+.meta-tile b{color:#fff}
+.msg-tile{
+  background:var(--tile);border-left:4px solid #475569;padding:9px 11px;
+  display:flex;flex-direction:column;gap:5px;transition:border-color .15s;
+}
+.msg-tile.has-conflict{border-left-color:var(--red);background:#241418}
+.msg-tile.has-coref{border-left-color:var(--teal)}
+.msg-top{display:flex;align-items:center;gap:6px;font-size:11.5px}
+.msg-id{background:var(--blue);color:#fff;font-weight:700;padding:1px 6px;font-size:11px}
+.msg-tile.has-conflict .msg-id{background:var(--red)}
+.msg-src{color:var(--muted);flex:1;font-weight:600}
+.tag-mini{font-size:10px;font-weight:700;padding:1px 5px;text-transform:uppercase}
+.tag-mini.c{background:var(--red);color:#fff}
+.tag-mini.s{background:var(--teal);color:#fff}
+.msg-del{background:transparent;border:none;color:var(--muted);padding:0 4px;font-size:15px}
+.msg-del:hover{color:#ff6b6b;background:transparent}
+.msg-txt{font-size:13px;line-height:1.48;color:#f1f5f9}
+mark.hl-coref{background:rgba(0,130,114,.42);color:#99f6e4;border-bottom:2px solid #2dd4bf;padding:0 3px;font-weight:600}
 
-.alarm{border-radius:9px;padding:10px 12px;border:1px solid rgba(239,68,68,.45);background:rgba(239,68,68,.12);display:flex;flex-direction:column;gap:6px}
-.alarm.wysoki{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.12)}
-.alarm.niski{border-color:rgba(47,191,143,.45);background:rgba(47,191,143,.1)}
-.alarm-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:13px}
-.risk-tags{display:flex;flex-wrap:wrap;gap:5px}
-.rtag{font-size:11px;padding:2px 7px;border-radius:5px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);color:#fca5a5}
+.add-tile{
+  border-top:2px solid var(--line);padding:9px 12px;background:#121720;
+  display:flex;flex-direction:column;gap:6px;
+}
+.add-row{display:grid;grid-template-columns:72px 1fr;gap:6px}
+.add-tile textarea{width:100%;min-height:48px;resize:vertical}
 
-.card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-.card h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-.kv{font-size:12.5px;line-height:1.45}
-.kv b{color:#cdd6e6}
+/* Col 2: Metro Sections */
+.m-tile{background:var(--tile);border:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.m-tile h3{margin:0;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+.kv{font-size:12.8px;line-height:1.45}
+.kv b{color:#cbd5e1}
 
-.cluster{border-left:3px solid var(--ok);padding:7px 10px;background:rgba(47,191,143,.07);border-radius:0 7px 7px 0;font-size:12.3px}
-.cluster .chips{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
-.chip{background:rgba(47,191,143,.18);color:#6ee7b7;padding:2px 8px;border-radius:5px;font-size:11.5px;font-weight:600}
+.cluster-tile{background:#0f2422;border-left:4px solid var(--teal);padding:8px 10px;font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0}
+.chip{background:var(--teal);color:#fff;padding:2px 8px;font-size:11.5px;font-weight:600}
 
-.conflict{border-left:3px solid var(--err);padding:8px 10px;background:rgba(239,68,68,.09);border-radius:0 7px 7px 0;font-size:12.3px;line-height:1.4}
-.conflict .ctop{font-weight:700;color:#fca5a5;margin-bottom:3px;font-size:11.8px}
+.conflict-tile{background:#2a1215;border-left:4px solid var(--red);padding:8px 10px;font-size:12.5px;line-height:1.42}
+.conflict-tile .ctop{font-weight:700;color:#fca5a5;font-size:11.5px;text-transform:uppercase;margin-bottom:3px}
 
-.sector-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sector{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface2);display:flex;flex-direction:column;gap:4px}
-.sector.p1{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.12)}
-.sector.p2{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.09)}
-.sector-top{display:flex;justify-content:space-between;align-items:center}
-.s-code{font-weight:700;font-size:14px}
-.s-badge{font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.1)}
-.sector.p1 .s-badge{background:var(--err);color:#fff}
-.sector.p2 .s-badge{background:var(--warn);color:#111}
-.s-name{font-size:12px;font-weight:600;color:#dce4f2}
-.s-reason{font-size:11.3px;color:var(--muted);line-height:1.35}
+/* Col 3: Sector Metro Grid + Questions + Timeline */
+.sector-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sec-tile{
+  background:var(--tile);border:1px solid var(--line);border-top:4px solid #475569;
+  padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-height:84px;
+}
+.sec-tile.p1{background:#2d1216;border-color:#7f1d1d;border-top-color:var(--red)}
+.sec-tile.p2{background:#291d12;border-color:#78350f;border-top-color:var(--amber)}
+.sec-top{display:flex;justify-content:space-between;align-items:center}
+.s-code{font-size:18px;font-weight:700}
+.s-badge{font-size:10px;font-weight:700;padding:2px 6px;background:#334155;color:#fff;letter-spacing:.04em}
+.sec-tile.p1 .s-badge{background:var(--red)}
+.sec-tile.p2 .s-badge{background:var(--amber)}
+.s-name{font-size:12.5px;font-weight:600;color:#fff}
+.s-reason{font-size:11.5px;color:#cbd5e1;line-height:1.35}
 
-.timeline-item{display:flex;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
-.timeline-item:last-child{border-bottom:none}
-.t-time{font-weight:700;color:var(--accent2);min-width:44px}
+.q-tile{background:#122136;border-left:4px solid var(--blue);padding:10px 12px}
+.q-item{display:flex;align-items:flex-start;gap:8px;font-size:12.6px;line-height:1.4;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.q-item:last-child{border-bottom:none}
+.q-item input{margin-top:3px;accent-color:var(--blue)}
 
-.q-list{margin:0;padding-left:18px;font-size:12.3px;line-height:1.5;color:#dce4f2}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;width:400px;display:flex;flex-direction:column;gap:12px}
+.tl-item{display:flex;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tl-item:last-child{border-bottom:none}
+.t-time{font-weight:700;color:#60a5fa;min-width:44px}
+
+.notice-regex{background:#3b2009;border-left:4px solid var(--amber);padding:8px 10px;font-size:12px;color:#fde68a}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:50}
+.modal{background:var(--surface);border:2px solid var(--blue);padding:18px 20px;width:400px;display:flex;flex-direction:column;gap:12px}
 .modal label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
-@media (max-width:1100px){main{grid-template-columns:1fr;overflow-y:auto}body{height:auto;overflow:auto}}
+@media (max-width:1120px){
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  main{grid-template-columns:1fr;overflow-y:auto}
+  body{height:auto;overflow:auto}
+}
 </style>
 </head>
 <body>
+
 <header>
   <div class="brand">
-    <div class="logo">SAR</div>
+    <div class="metro-mark">SAR</div>
     <div>
-      <h1>Sztab-SAR <span style="font-weight:400;color:var(--muted)">— Taktyczny Koordynator Poszukiwań</span></h1>
-      <div class="sub">100% offline w terenie · Koreferencja śladów · Audyt sprzeczności czasu</div>
+      <h1>Sztab-<b>SAR</b> <span style="color:var(--muted);font-size:14px">Taktyczny Koordynator Poszukiwań</span></h1>
+      <div class="sub">100% offline w terenie · Koreferencja śladów · Audyt kolizji godzin i kierunków</div>
     </div>
   </div>
-  <div class="controls">
-    <span id="statusPill" class="pill">Łączenie z modelem…</span>
-    <select id="scenarioSel" onchange="loadScenario(this.value)" title="Wybierz przypadek testowy"></select>
-    <select id="modelSel" onchange="switchModel(this.value)" title="Model SLM (<10B)">
-      <option value="bielik">Bielik-4.5B-v3.0 (BPE Fix)</option>
-      <option value="gemma">Gemma-4-E4B-it</option>
-    </select>
-    <label class="toggle" title="Porównaj inteligencję SLM z samym dopasowaniem słów (Regex)">
-      <input type="checkbox" id="useSlm" checked> Analiza SLM
-    </label>
-    <button id="cfgBtn" style="display:none" onclick="openSettings()">⚙️ Ustawienia</button>
+  <div class="cmd-bar">
+    <select id="scenarioSel" onchange="loadScenario(this.value)" title="Wybierz akcję poszukiwawczą"></select>
+    <div class="seg-group" title="Przełącznik silnika analizy">
+      <button class="seg-btn active" id="btnBielik" onclick="setEngine('bielik')">SLM: Bielik-4.5B</button>
+      <button class="seg-btn" id="btnGemma" onclick="setEngine('gemma')">SLM: Gemma-4-E4B</button>
+      <button class="seg-btn regex" id="btnRegex" onclick="setEngine('regex')">Bez SLM (Regex)</button>
+    </div>
+    <button id="cfgBtn" style="display:none" onclick="openSettings()">Ustawienia</button>
     <button id="runBtn" class="primary" onclick="runAnalyze()">Analizuj sytuację</button>
   </div>
 </header>
 
+<!-- Live Metro Tiles -->
+<section class="kpi-strip">
+  <div class="kpi-tile red" id="tileAlarm">
+    <span class="kpi-lbl">Poziom alarmu</span>
+    <span class="kpi-val" id="valAlarm">—</span>
+    <span class="kpi-sub" id="subAlarm">Oczekiwanie na analizę…</span>
+  </div>
+  <div class="kpi-tile" id="tileSector" style="background:#004e8c;border-left-color:#38bdf8">
+    <span class="kpi-lbl">Sektor Priorytet #1</span>
+    <span class="kpi-val" id="valSector">—</span>
+    <span class="kpi-sub" id="subSector">Wyznaczanie z śladów…</span>
+  </div>
+  <div class="kpi-tile teal">
+    <span class="kpi-lbl">Złączone ślady (Koreferencja)</span>
+    <span class="kpi-val" id="valCoref">0</span>
+    <span class="kpi-sub" id="subCoref">Synonimy ubioru i cech</span>
+  </div>
+  <div class="kpi-tile amber">
+    <span class="kpi-lbl">Wykryte sprzeczności</span>
+    <span class="kpi-val" id="valConf">0</span>
+    <span class="kpi-sub" id="subConf">Kolizje czasu / kierunku</span>
+  </div>
+  <div class="kpi-tile" id="tileStatus">
+    <span class="kpi-lbl">Aktywny silnik lokalny</span>
+    <span class="kpi-val" style="font-size:15px" id="valEngine">Łączenie…</span>
+    <span class="kpi-sub" id="subEngine">—</span>
+  </div>
+</section>
+
 <main>
-  <!-- KOLUMNA 1: Meldunki -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>1. Dziennik meldunków (Radio / SMS / 112)</h2>
-      <label style="cursor:pointer;font-size:11.5px;color:var(--accent2)">
+  <!-- KOLUMNA 1: Meldunki z podświetleniem śladów i konfliktów -->
+  <section class="col">
+    <div class="col-head">
+      <h2>1. Dziennik meldunków (Źródła)</h2>
+      <label style="cursor:pointer;font-size:11.5px;color:#60a5fa;font-weight:600">
         + Wgraj plik (.txt/.log)
         <input type="file" accept=".txt,.log" style="display:none" onchange="uploadFile(this.files[0])">
       </label>
     </div>
-    <div class="panel-body">
-      <div class="meta-bar">
+    <div class="col-body">
+      <div class="meta-tile">
         <div>Miejsce: <b id="metaPlace">—</b></div>
         <div>Warunki: <b id="metaWeather">—</b></div>
       </div>
-      <div id="msgList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div id="msgList" style="display:flex;flex-direction:column;gap:7px"></div>
     </div>
-    <div class="add-box">
-      <div style="font-size:11.5px;font-weight:600;color:var(--muted)">+ Dodaj nowy meldunek na żywo</div>
+    <div class="add-tile">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">+ Nowy meldunek z radia / 112</div>
       <div class="add-row">
         <input id="newTime" value="15:18" placeholder="HH:MM">
-        <input id="newSrc" value="Patrol OSP-3 / Świadek" placeholder="Źródło (np. Patrol, Świadek)">
+        <input id="newSrc" value="Patrol OSP-3" placeholder="Źródło (np. Patrol, Świadek)">
       </div>
-      <textarea id="newTxt" placeholder="Wpisz nowy trop lub zeznanie (np. 'Słyszano wołanie przy rozlewisku A2' albo sprzeczną godzinę)..."></textarea>
+      <textarea id="newTxt" placeholder="Wpisz nowy trop lub sprzeczną informację i kliknij Dodaj..."></textarea>
       <button onclick="addLiveMessage()">Dodaj meldunek i przelicz</button>
     </div>
   </section>
 
-  <!-- KOLUMNA 2: Zespolenie SLM + Sprzeczności -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>2. Koreferencja śladów i konflikty</h2>
+  <!-- KOLUMNA 2: Zespolony profil + Klastry + Konflikty -->
+  <section class="col">
+    <div class="col-head">
+      <h2>2. Synteza SLM i sprzeczności</h2>
       <span id="latencyBadge" style="font-size:11.5px;color:var(--muted)">—</span>
     </div>
-    <div class="panel-body" id="col2">
-      <div style="color:var(--muted);font-size:13px">Kliknij „Analizuj sytuację”, aby model SLM połączył ślady i wykrył sprzeczności.</div>
+    <div class="col-body" id="col2">
+      <div style="color:var(--muted);font-size:13px">Ładowanie scenariusza…</div>
     </div>
   </section>
 
-  <!-- KOLUMNA 3: Mapa sektorów + Rozkaz -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>3. Priorytet sektorów i rozkaz</h2>
-      <button onclick="exportOrder()">Pobierz Rozkaz (.html)</button>
+  <!-- KOLUMNA 3: Mapa sektorów A1-C2 + Pytania dyspozytora + Oś czasu -->
+  <section class="col">
+    <div class="col-head">
+      <h2>3. Sektory A1–C2 i pytania dyspozytora</h2>
+      <button class="primary" style="padding:4px 10px;font-size:11.5px" onclick="exportOrder()">Rozkaz (.html)</button>
     </div>
-    <div class="panel-body" id="col3">
-      <div style="color:var(--muted);font-size:13px">Siatka taktyczna i pytania weryfikacyjne pojawią się po analizie.</div>
+    <div class="col-body" id="col3">
+      <div style="color:var(--muted);font-size:13px">Oczekiwanie na analizę…</div>
     </div>
   </section>
 </main>
 
 <div class="modal-bg" id="cfgModal">
   <div class="modal">
-    <h3 style="margin:0;font-size:15px">Ustawienia lokalnego silnika</h3>
-    <label>Aktywny model GGUF (<10B)
+    <h3 style="margin:0;font-size:16px;font-weight:600">Ustawienia lokalnego silnika</h3>
+    <label>Domyślny model GGUF (&lt;10B)
       <select id="cfgModel">
         <option value="bielik">Bielik-4.5B-v3.0-Instruct (PL domyślny)</option>
         <option value="gemma">Gemma-4-E4B-it</option>
       </select>
     </label>
-    <label>Urządzenie obliczeniowe
+    <label>Akceleracja sprzętowa
       <select id="cfgGpu">
-        <option value="auto">Auto (GPU Vulkan / CUDA jeśli dostępne)</option>
+        <option value="auto">Auto (GPU Vulkan / CUDA)</option>
         <option value="cpu">Tylko CPU</option>
       </select>
     </label>
@@ -194,14 +295,44 @@ let SCENARIOS = [];
 let currentMeta = {};
 let currentMsgs = [];
 let lastReport = null;
+let engineMode = 'bielik'; // 'bielik' | 'gemma' | 'regex'
 
 function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function syncEngineButtons(){
+  document.getElementById('btnBielik').classList.toggle('active', engineMode==='bielik');
+  document.getElementById('btnGemma').classList.toggle('active', engineMode==='gemma');
+  document.getElementById('btnRegex').classList.toggle('active', engineMode==='regex');
+}
+
+async function setEngine(mode){
+  engineMode = mode;
+  syncEngineButtons();
+  if(mode !== 'regex'){
+    document.getElementById('valEngine').textContent = mode === 'bielik' ? 'Bielik-4.5B' : 'Gemma-4-E4B';
+    document.getElementById('subEngine').textContent = 'Aktywuję model…';
+    try{
+      const r = await fetch('/api/model', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({model:mode})});
+      const d = await r.json();
+      document.getElementById('valEngine').textContent = mode === 'bielik' ? 'Bielik-4.5B' : 'Gemma-4-E4B';
+      document.getElementById('subEngine').textContent = `${d.device || 'GPU'} · gotowy`;
+    } catch {
+      document.getElementById('subEngine').textContent = 'Błąd przełączania';
+    }
+  } else {
+    document.getElementById('valEngine').textContent = 'Tryb Regex';
+    document.getElementById('subEngine').textContent = 'Bez SLM (słowa kluczowe)';
+  }
+  runAnalyze();
+}
 
 async function init(){
   try{
     const st = await fetch('/api/status').then(r=>r.json());
-    document.getElementById('statusPill').textContent = `${st.model} · ${st.device}`;
-    if(st.active_key) document.getElementById('modelSel').value = st.active_key;
+    engineMode = st.active_key || 'bielik';
+    syncEngineButtons();
+    document.getElementById('valEngine').textContent = engineMode === 'bielik' ? 'Bielik-4.5B' : 'Gemma-4-E4B';
+    document.getElementById('subEngine').textContent = `${st.model} · ${st.device}`;
     if(st.settings){
       document.getElementById('cfgBtn').style.display = 'inline-flex';
       document.getElementById('cfgModel').value = st.settings.model || 'bielik';
@@ -209,7 +340,7 @@ async function init(){
       document.getElementById('cfgThreads').value = st.settings.threads || 8;
     }
   } catch {
-    document.getElementById('statusPill').textContent = 'Błąd połączenia z modelem';
+    document.getElementById('valEngine').textContent = 'Offline / Błąd';
   }
   const sc = await fetch('/api/scenarios').then(r=>r.json());
   SCENARIOS = sc.scenarios || [];
@@ -223,36 +354,95 @@ function loadScenario(id){
   if(!s) return;
   currentMeta = JSON.parse(JSON.stringify(s.meta || {}));
   currentMsgs = JSON.parse(JSON.stringify(s.messages || []));
+  lastReport = null;
   renderMessages();
   runAnalyze();
+}
+
+function phraseToStemRegex(phrase){
+  const parts = String(phrase||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return null;
+  const rxParts = parts.map(w => {
+    const clean = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if(w.length >= 5){
+      const stem = w.slice(0, Math.max(4, w.length - 3)).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return stem + '[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]{0,5}';
+    }
+    return clean;
+  });
+  return new RegExp(rxParts.join('\\s+'), 'gi');
+}
+
+function highlightPhrases(text, phrases){
+  const src = String(text||'');
+  const uniq = [...new Set((phrases||[]).filter(p=>p && p.length >= 4))].sort((a,b)=>b.length-a.length);
+  const ranges = [];
+  for(const p of uniq){
+    const rx = phraseToStemRegex(p);
+    if(!rx) continue;
+    let m;
+    while((m = rx.exec(src)) !== null){
+      if(m[0].length >= 4) ranges.push([m.index, m.index + m[0].length]);
+      if(m.index === rx.lastIndex) rx.lastIndex++;
+    }
+  }
+  if(!ranges.length) return esc(src);
+  ranges.sort((a,b)=>a[0]-b[0] || b[1]-a[1]);
+  const merged = [];
+  for(const r of ranges){
+    if(!merged.length || r[0] > merged[merged.length-1][1]) merged.push(r);
+    else if(r[1] > merged[merged.length-1][1]) merged[merged.length-1][1] = r[1];
+  }
+  let out = '', pos = 0;
+  for(const [s, e] of merged){
+    out += esc(src.slice(pos, s)) + '<mark class="hl-coref">' + esc(src.slice(s, e)) + '</mark>';
+    pos = e;
+  }
+  return out + esc(src.slice(pos));
 }
 
 function renderMessages(){
   document.getElementById('metaPlace').textContent = currentMeta.miejsce || '—';
   document.getElementById('metaWeather').textContent = currentMeta.pogoda || '—';
-  const list = document.getElementById('msgList');
-  list.innerHTML = currentMsgs.map((m, idx)=>`
-    <div class="msg-card">
-      <div class="msg-top">
-        <span class="msg-id">${esc(m.id)} · ${esc(m.time)}</span>
-        <span class="msg-src">${esc(m.source)}</span>
-        <button class="msg-del" onclick="removeMsg(${idx})" title="Usuń meldunek">×</button>
-      </div>
-      <div class="msg-txt">${esc(m.text)}</div>
-    </div>`).join('');
+
+  const conflictIds = new Set();
+  const corefIds = new Set();
+  const allPhrases = [];
+  if(lastReport && lastReport.analysis){
+    for(const c of (lastReport.analysis.sprzecznosci || [])){
+      for(const id of (c.ids || [])) conflictIds.add(id);
+    }
+    for(const cl of (lastReport.analysis.klastry_sladow || [])){
+      for(const id of (cl.ids || [])) corefIds.add(id);
+      for(const f of (cl.frazy || [])) allPhrases.push(f);
+    }
+  }
+
+  document.getElementById('msgList').innerHTML = currentMsgs.map((m, idx)=>{
+    const isConf = conflictIds.has(m.id);
+    const isCoref = corefIds.has(m.id);
+    const cls = isConf ? 'has-conflict' : (isCoref ? 'has-coref' : '');
+    const badges = `${isConf ? '<span class="tag-mini c">KONFLIKT</span>' : ''}${isCoref ? '<span class="tag-mini s">ŚLAD</span>' : ''}`;
+    return `
+      <div class="msg-tile ${cls}">
+        <div class="msg-top">
+          <span class="msg-id">${esc(m.id)} · ${esc(m.time)}</span>
+          <span class="msg-src">${esc(m.source)}</span>
+          ${badges}
+          <button class="msg-del" onclick="removeMsg(${idx})" title="Usuń meldunek">×</button>
+        </div>
+        <div class="msg-txt">${highlightPhrases(m.text, allPhrases)}</div>
+      </div>`;
+  }).join('');
 }
 
-function removeMsg(idx){
-  currentMsgs.splice(idx, 1);
-  renderMessages();
-}
+function removeMsg(idx){ currentMsgs.splice(idx, 1); renderMessages(); }
 
 function addLiveMessage(){
   const txt = document.getElementById('newTxt').value.trim();
   if(!txt) return;
-  const nextId = `M${currentMsgs.length + 1}`;
   currentMsgs.push({
-    id: nextId,
+    id: `M${currentMsgs.length + 1}`,
     time: document.getElementById('newTime').value.trim() || '--:--',
     source: document.getElementById('newSrc').value.trim() || 'Meldunek terenowy',
     text: txt,
@@ -275,31 +465,23 @@ async function uploadFile(file){
   }
 }
 
-async function switchModel(key){
-  const pill = document.getElementById('statusPill');
-  pill.textContent = `Przełączam na ${key}…`;
-  try{
-    const r = await fetch('/api/model', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({model:key})});
-    const d = await r.json();
-    pill.textContent = `${d.model} · ${d.device}`;
-  } catch { pill.textContent = 'Błąd przełączania modelu'; }
-}
-
 async function runAnalyze(){
   const btn = document.getElementById('runBtn');
   btn.disabled = true; btn.textContent = 'Analizuję…';
+  const useSlm = engineMode !== 'regex';
   try{
     const r = await fetch('/api/analyze', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         messages: currentMsgs,
         meta: currentMeta,
-        use_slm: document.getElementById('useSlm').checked,
-        model: document.getElementById('modelSel').value
+        use_slm: useSlm,
+        model: useSlm ? engineMode : null
       })
     });
     const d = await r.json();
     lastReport = d;
+    renderMessages();
     renderAnalysis(d);
   } catch(e){
     alert('Błąd analizy: ' + e.message);
@@ -312,77 +494,106 @@ function renderAnalysis(d){
   const a = d.analysis || {};
   const ass = d.assessment || {};
   const p = a.profil_zaginionego || {};
-  document.getElementById('latencyBadge').textContent = `${(d.mode||'').toUpperCase()} · ${d.latency_ms||0} ms`;
+  const sectors = ass.sectors || [];
+  const topSec = sectors.find(s=>s.priority===1) || sectors[0];
+  const clusters = a.klastry_sladow || [];
+  const conflicts = a.sprzecznosci || [];
 
-  const alCls = ass.alarm_level === 'KRYTYCZNY' ? '' : (ass.alarm_level === 'WYSOKI' ? 'wysoki' : 'niski');
-  const riskTags = (ass.risk_factors || []).map(f=>`<span class="rtag">${esc(f)}</span>`).join('');
-  const clustersHtml = (a.klastry_sladow || []).map(cl=>`
-    <div class="cluster">
+  // Aktualizacja Live Metro Tiles
+  const alTile = document.getElementById('tileAlarm');
+  alTile.className = 'kpi-tile ' + (ass.alarm_level==='KRYTYCZNY' ? 'red' : (ass.alarm_level==='WYSOKI' ? 'amber' : 'green'));
+  document.getElementById('valAlarm').textContent = `${ass.alarm_level || 'PODWYŻSZONY'} · ${ass.golden_window_min || 90}m`;
+  document.getElementById('subAlarm').textContent = (ass.risk_factors || []).slice(0,2).join(' · ') || 'Brak krytycznych ryzyk medycznych';
+
+  document.getElementById('valSector').textContent = topSec ? `${topSec.code} · ${topSec.name}` : '—';
+  document.getElementById('subSector').textContent = topSec ? topSec.reason : 'Brak wskazań sektorowych';
+
+  document.getElementById('valCoref').textContent = `${clusters.length}`;
+  document.getElementById('subCoref').textContent = clusters.length ? (clusters[0].frazy||[]).join(' ↔ ') : 'Brak połączonych synonimów';
+
+  document.getElementById('valConf').textContent = `${conflicts.length}`;
+  document.getElementById('subConf').textContent = conflicts.length ? `${conflicts[0].type}` : 'Brak kolizji czasowych';
+
+  document.getElementById('latencyBadge').textContent = `${(d.mode||'').toUpperCase()} · ${d.latency_ms||0} ms`;
+  if(d.mode === 'regex'){
+    document.getElementById('valEngine').textContent = 'Tryb Regex';
+    document.getElementById('subEngine').textContent = `1 ms · bez zrozumienia synonimów`;
+  } else {
+    document.getElementById('valEngine').textContent = engineMode === 'bielik' ? 'Bielik-4.5B' : 'Gemma-4-E4B';
+    document.getElementById('subEngine').textContent = `${d.latency_ms} ms · ${d.model || ''}`;
+  }
+
+  // Kolumna 2
+  const regexBanner = d.mode === 'regex'
+    ? `<div class="notice-regex"><b>Tryb porównania (bez SLM):</b> proste reguły wykrywają tylko dosłowne słowa kluczowe — nie łączą synonimów i nie generują pytań do świadków.</div>`
+    : '';
+
+  const clustersHtml = clusters.map(cl=>`
+    <div class="cluster-tile">
       <b>${esc(cl.tytul)}</b> <span style="color:var(--muted)">(${esc((cl.ids||[]).join(', '))})</span>
       <div class="chips">${(cl.frazy||[]).map(f=>`<span class="chip">${esc(f)}</span>`).join('')}</div>
-      <div style="color:var(--muted)">${esc(cl.uzasadnienie)}</div>
-    </div>`).join('') || '<div style="color:var(--muted);font-size:12.5px">Brak skorelowanych klastrów śladów.</div>';
+      <div style="color:#cbd5e1">${esc(cl.uzasadnienie)}</div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12.5px">Brak połączonych klastrów synonimów.</div>';
 
-  const confHtml = (a.sprzecznosci || []).map(c=>`
-    <div class="conflict">
+  const confHtml = conflicts.map(c=>`
+    <div class="conflict-tile">
       <div class="ctop">[${esc((c.ids||[]).join(' ↔ '))}] ${esc(c.type)}</div>
       <div>${esc(c.description)}</div>
-    </div>`).join('') || '<div style="color:var(--ok);font-size:12.5px">Brak sprzeczności czasowo-terenowych.</div>';
+    </div>`).join('') || '<div style="color:#4ade80;font-size:12.5px">Brak wykrytych sprzeczności czasowo-terenowych.</div>';
 
   document.getElementById('col2').innerHTML = `
-    <div class="alarm ${alCls}">
-      <div class="alarm-top">
-        <span>POZIOM ALARMU: ${esc(ass.alarm_level || 'PODWYŻSZONY')}</span>
-        <span>Złote okno: ${ass.golden_window_min || 90} min</span>
-      </div>
-      <div class="risk-tags">${riskTags || '<span class="rtag">Brak krytycznych ryzyk medycznych</span>'}</div>
-    </div>
-    <div class="card">
+    ${regexBanner}
+    <div class="m-tile">
       <h3>Zespolony profil zaginionego</h3>
       <div class="kv"><b>Osoba:</b> ${esc(p.osoba)}</div>
       <div class="kv"><b>Ubiór:</b> ${esc(p.ubior)}</div>
-      <div class="kv"><b>Zdrowie:</b> ${esc(p.zdrowie)}</div>
-      <div class="kv"><b>Kierunek:</b> ${esc(p.kierunek)}</div>
+      <div class="kv"><b>Zdrowie i ryzyka:</b> ${esc(p.zdrowie)}</div>
+      <div class="kv"><b>Kierunek śladu:</b> ${esc(p.kierunek)}</div>
     </div>
-    <div class="card">
+    <div class="m-tile">
       <h3>Złączone ślady (koreferencja synonimów)</h3>
       ${clustersHtml}
     </div>
-    <div class="card">
-      <h3>Wykryte sprzeczności i fałszywe tropy</h3>
+    <div class="m-tile">
+      <h3>Wykryte sprzeczności i anomalie</h3>
       ${confHtml}
     </div>`;
 
-  const sectors = ass.sectors || [];
+  // Kolumna 3: Sektory + Pytania (od razu pod siatka!) + Os czasu
   const secHtml = sectors.map(s=>{
     const cls = s.priority === 1 ? 'p1' : (s.priority === 2 ? 'p2' : '');
-    return `<div class="sector ${cls}">
-      <div class="sector-top"><span class="s-code">${esc(s.code)}</span><span class="s-badge">${esc(s.badge)}</span></div>
+    return `<div class="sec-tile ${cls}">
+      <div class="sec-top"><span class="s-code">${esc(s.code)}</span><span class="s-badge">${esc(s.badge)}</span></div>
       <div class="s-name">${esc(s.name)}</div>
       <div class="s-reason">${esc(s.reason)}</div>
     </div>`;
   }).join('');
 
+  const qList = a.pytania_do_swiadkow || [];
+  const qHtml = qList.map((q, i)=>`
+    <label class="q-item">
+      <input type="checkbox" id="qchk_${i}">
+      <span>${esc(q)}</span>
+    </label>`).join('') || '<div style="color:var(--muted);font-size:12px">Brak dodatkowych pytań.</div>';
+
   const tlHtml = (a.os_czasu || []).map(ev=>`
-    <div class="timeline-item">
+    <div class="tl-item">
       <span class="t-time">${esc(ev.time || '--:--')}</span>
-      <div><b>[${esc(ev.id)}]</b> ${esc(ev.event)} <span style="color:var(--muted)">(${esc(ev.confidence)})</span></div>
+      <div><b>[${esc(ev.id)}]</b> ${esc(ev.event)}</div>
     </div>`).join('');
 
-  const qHtml = (a.pytania_do_swiadkow || []).map(q=>`<li>${esc(q)}</li>`).join('');
-
   document.getElementById('col3').innerHTML = `
-    <div class="card">
+    <div class="m-tile">
       <h3>Taktyczna siatka sektorów (A1–C2)</h3>
       <div class="sector-grid">${secHtml}</div>
     </div>
-    <div class="card">
+    <div class="q-tile">
+      <h3 style="margin:0 0 6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:#93c5fd">Pytania weryfikacyjne dla dyspozytora</h3>
+      ${qHtml}
+    </div>
+    <div class="m-tile">
       <h3>Oś czasu zdarzeń</h3>
       ${tlHtml}
-    </div>
-    <div class="card">
-      <h3>Pytania weryfikacyjne dla dyspozytora</h3>
-      <ol class="q-list">${qHtml}</ol>
     </div>`;
 }
 
@@ -409,8 +620,10 @@ async function saveSettings(){
     })
   });
   const d = await r.json();
-  document.getElementById('statusPill').textContent = `${d.model} · ${d.device}`;
-  document.getElementById('modelSel').value = d.active_key || 'bielik';
+  engineMode = d.active_key || 'bielik';
+  syncEngineButtons();
+  document.getElementById('valEngine').textContent = engineMode === 'bielik' ? 'Bielik-4.5B' : 'Gemma-4-E4B';
+  document.getElementById('subEngine').textContent = `${d.model} · ${d.device}`;
   btn.disabled = false; closeSettings();
 }
 

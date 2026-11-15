@@ -280,8 +280,22 @@ def ground_and_verify(
             times = _extract_times_hhmm(m.get("text", ""))
             t_str = _fmt_hhmm(times[0]) if times else m.get("time", "")
             timeline.append({"time": t_str, "id": m["id"], "event": m["text"][:140], "confidence": "źródło"})
+    timeline.sort(key=lambda ev: ev.get("time") or "99:99")
 
-    questions = [str(q) for q in (slm_data.get("pytania_do_swiadkow") or []) if q][:5]
+    questions = [str(q).strip() for q in (slm_data.get("pytania_do_swiadkow") or []) if str(q).strip()]
+    # Jesli SLM zwrocil za malo pytan (lub uciete przy limicie tokenow), dopelnij deterministycznie z faktow
+    if len(questions) < 2:
+        for c in conflicts[:2]:
+            c_ids = ", ".join(c.get("ids") or []) or "źródła"
+            q = f"Zweryfikuj konflikt [{c_ids}]: ustal dokładną godzinę na zegarku świadka i czy opis ubioru dotyczy tej samej osoby."
+            if q not in questions:
+                questions.append(q)
+        top_sec = next((s for s in sectors if s.get("priority") == 1), None)
+        if top_sec and len(questions) < 3:
+            questions.append(f"Skieruj pierwszą grupę / drona do sektora {top_sec['code']} ({top_sec['name']}) i potwierdź fizyczne ślady.")
+        if factors and len(questions) < 4:
+            questions.append(f"Potwierdź z rodziną stan zdrowia i leki: {factors[0]}.")
+    questions = questions[:5]
     profil = slm_data.get("profil_zaginionego") or {}
 
     cleaned = {

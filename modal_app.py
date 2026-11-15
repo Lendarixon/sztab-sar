@@ -127,7 +127,7 @@ class SztabService:
             ],
             response_format={"type": "json_object"},
             temperature=0.0,
-            max_tokens=520,
+            max_tokens=680,
         )
         content = resp["choices"][0]["message"]["content"]
         data = parse_slm_json(content)
