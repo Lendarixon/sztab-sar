@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sztab-SAR — Taktyczny Koordynator Poszukiwań Offline</title>
+<style>
+:root{
+  --bg:#0b0e14; --surface:#12161f; --surface2:#191f2c; --border:rgba(255,255,255,0.09);
+  --text:#eceff4; --muted:#9aa3b5; --accent:#2f6fe6; --accent2:#5b8ff0;
+  --ok:#2fbf8f; --warn:#f59e0b; --err:#ef4444;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI Variable","Segoe UI",system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#dc2626,#f59e0b);display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
+.brand h1{margin:0;font-size:15px;font-weight:600}
+.brand .sub{font-size:11.5px;color:var(--muted)}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+select,button,input,textarea{font:inherit;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12.5px}
+button{cursor:pointer;transition:.15s}
+button:hover{border-color:rgba(255,255,255,0.22)}
+button.primary{background:var(--accent);border-color:var(--accent);font-weight:600}
+button.primary:hover{background:#265ec7}
+button:disabled{opacity:.55;cursor:wait}
+.pill{font-size:11.5px;padding:4px 9px;border-radius:999px;background:rgba(47,191,143,.14);color:#6ee7b7;border:1px solid rgba(47,191,143,.32)}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:7px}
+.toggle input{accent-color:var(--accent);margin:0}
+
+main{flex:1;display:grid;grid-template-columns:1.05fr 1.15fr 1.1fr;gap:12px;padding:12px 16px;overflow:hidden;min-height:0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:11px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel-head h2{margin:0;font-size:13px;font-weight:600;color:#dbe2ef;text-transform:uppercase;letter-spacing:.04em}
+.panel-body{padding:12px 14px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+
+.meta-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--muted)}
+.meta-bar b{color:var(--text);font-weight:600}
+
+.msg-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:4px}
+.msg-top{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11.5px}
+.msg-id{font-weight:700;color:var(--accent2)}
+.msg-src{color:var(--muted);flex:1}
+.msg-del{background:transparent;border:none;color:var(--muted);padding:0 4px;font-size:14px;line-height:1}
+.msg-del:hover{color:var(--err)}
+.msg-txt{font-size:12.8px;line-height:1.45;color:var(--text)}
+
+.add-box{border-top:1px solid var(--border);padding:10px 14px;background:rgba(255,255,255,.015);display:flex;flex-direction:column;gap:6px}
+.add-row{display:grid;grid-template-columns:76px 1fr;gap:6px}
+.add-box textarea{width:100%;min-height:54px;resize:vertical}
+
+.alarm{border-radius:9px;padding:10px 12px;border:1px solid rgba(239,68,68,.45);background:rgba(239,68,68,.12);display:flex;flex-direction:column;gap:6px}
+.alarm.wysoki{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.12)}
+.alarm.niski{border-color:rgba(47,191,143,.45);background:rgba(47,191,143,.1)}
+.alarm-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:13px}
+.risk-tags{display:flex;flex-wrap:wrap;gap:5px}
+.rtag{font-size:11px;padding:2px 7px;border-radius:5px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);color:#fca5a5}
+
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.kv{font-size:12.5px;line-height:1.45}
+.kv b{color:#cdd6e6}
+
+.cluster{border-left:3px solid var(--ok);padding:7px 10px;background:rgba(47,191,143,.07);border-radius:0 7px 7px 0;font-size:12.3px}
+.cluster .chips{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
+.chip{background:rgba(47,191,143,.18);color:#6ee7b7;padding:2px 8px;border-radius:5px;font-size:11.5px;font-weight:600}
+
+.conflict{border-left:3px solid var(--err);padding:8px 10px;background:rgba(239,68,68,.09);border-radius:0 7px 7px 0;font-size:12.3px;line-height:1.4}
+.conflict .ctop{font-weight:700;color:#fca5a5;margin-bottom:3px;font-size:11.8px}
+
+.sector-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sector{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface2);display:flex;flex-direction:column;gap:4px}
+.sector.p1{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.12)}
+.sector.p2{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.09)}
+.sector-top{display:flex;justify-content:space-between;align-items:center}
+.s-code{font-weight:700;font-size:14px}
+.s-badge{font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.1)}
+.sector.p1 .s-badge{background:var(--err);color:#fff}
+.sector.p2 .s-badge{background:var(--warn);color:#111}
+.s-name{font-size:12px;font-weight:600;color:#dce4f2}
+.s-reason{font-size:11.3px;color:var(--muted);line-height:1.35}
+
+.timeline-item{display:flex;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.timeline-item:last-child{border-bottom:none}
+.t-time{font-weight:700;color:var(--accent2);min-width:44px}
+
+.q-list{margin:0;padding-left:18px;font-size:12.3px;line-height:1.5;color:#dce4f2}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;width:400px;display:flex;flex-direction:column;gap:12px}
+.modal label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+@media (max-width:1100px){main{grid-template-columns:1fr;overflow-y:auto}body{height:auto;overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">SAR</div>
+    <div>
+      <h1>Sztab-SAR <span style="font-weight:400;color:var(--muted)">— Taktyczny Koordynator Poszukiwań</span></h1>
+      <div class="sub">100% offline w terenie · Koreferencja śladów · Audyt sprzeczności czasu</div>
+    </div>
+  </div>
+  <div class="controls">
+    <span id="statusPill" class="pill">Łączenie z modelem…</span>
+    <select id="scenarioSel" onchange="loadScenario(this.value)" title="Wybierz przypadek testowy"></select>
+    <select id="modelSel" onchange="switchModel(this.value)" title="Model SLM (<10B)">
+      <option value="bielik">Bielik-4.5B-v3.0 (BPE Fix)</option>
+      <option value="gemma">Gemma-4-E4B-it</option>
+    </select>
+    <label class="toggle" title="Porównaj inteligencję SLM z samym dopasowaniem słów (Regex)">
+      <input type="checkbox" id="useSlm" checked> Analiza SLM
+    </label>
+    <button id="cfgBtn" style="display:none" onclick="openSettings()">⚙️ Ustawienia</button>
+    <button id="runBtn" class="primary" onclick="runAnalyze()">Analizuj sytuację</button>
+  </div>
+</header>
+
+<main>
+  <!-- KOLUMNA 1: Meldunki -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>1. Dziennik meldunków (Radio / SMS / 112)</h2>
+      <label style="cursor:pointer;font-size:11.5px;color:var(--accent2)">
+        + Wgraj plik (.txt/.log)
+        <input type="file" accept=".txt,.log" style="display:none" onchange="uploadFile(this.files[0])">
+      </label>
+    </div>
+    <div class="panel-body">
+      <div class="meta-bar">
+        <div>Miejsce: <b id="metaPlace">—</b></div>
+        <div>Warunki: <b id="metaWeather">—</b></div>
+      </div>
+      <div id="msgList" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="add-box">
+      <div style="font-size:11.5px;font-weight:600;color:var(--muted)">+ Dodaj nowy meldunek na żywo</div>
+      <div class="add-row">
+        <input id="newTime" value="15:18" placeholder="HH:MM">
+        <input id="newSrc" value="Patrol OSP-3 / Świadek" placeholder="Źródło (np. Patrol, Świadek)">
+      </div>
+      <textarea id="newTxt" placeholder="Wpisz nowy trop lub zeznanie (np. 'Słyszano wołanie przy rozlewisku A2' albo sprzeczną godzinę)..."></textarea>
+      <button onclick="addLiveMessage()">Dodaj meldunek i przelicz</button>
+    </div>
+  </section>
+
+  <!-- KOLUMNA 2: Zespolenie SLM + Sprzeczności -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>2. Koreferencja śladów i konflikty</h2>
+      <span id="latencyBadge" style="font-size:11.5px;color:var(--muted)">—</span>
+    </div>
+    <div class="panel-body" id="col2">
+      <div style="color:var(--muted);font-size:13px">Kliknij „Analizuj sytuację”, aby model SLM połączył ślady i wykrył sprzeczności.</div>
+    </div>
+  </section>
+
+  <!-- KOLUMNA 3: Mapa sektorów + Rozkaz -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>3. Priorytet sektorów i rozkaz</h2>
+      <button onclick="exportOrder()">Pobierz Rozkaz (.html)</button>
+    </div>
+    <div class="panel-body" id="col3">
+      <div style="color:var(--muted);font-size:13px">Siatka taktyczna i pytania weryfikacyjne pojawią się po analizie.</div>
+    </div>
+  </section>
+</main>
+
+<div class="modal-bg" id="cfgModal">
+  <div class="modal">
+    <h3 style="margin:0;font-size:15px">Ustawienia lokalnego silnika</h3>
+    <label>Aktywny model GGUF (<10B)
+      <select id="cfgModel">
+        <option value="bielik">Bielik-4.5B-v3.0-Instruct (PL domyślny)</option>
+        <option value="gemma">Gemma-4-E4B-it</option>
+      </select>
+    </label>
+    <label>Urządzenie obliczeniowe
+      <select id="cfgGpu">
+        <option value="auto">Auto (GPU Vulkan / CUDA jeśli dostępne)</option>
+        <option value="cpu">Tylko CPU</option>
+      </select>
+    </label>
+    <label>Wątki CPU <input type="number" id="cfgThreads" min="1" max="64" value="8"></label>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="closeSettings()">Anuluj</button>
+      <button class="primary" id="saveCfgBtn" onclick="saveSettings()">Zapisz i przeładuj</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let SCENARIOS = [];
+let currentMeta = {};
+let currentMsgs = [];
+let lastReport = null;
+
+function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function init(){
+  try{
+    const st = await fetch('/api/status').then(r=>r.json());
+    document.getElementById('statusPill').textContent = `${st.model} · ${st.device}`;
+    if(st.active_key) document.getElementById('modelSel').value = st.active_key;
+    if(st.settings){
+      document.getElementById('cfgBtn').style.display = 'inline-flex';
+      document.getElementById('cfgModel').value = st.settings.model || 'bielik';
+      document.getElementById('cfgGpu').value = st.settings.gpu || 'auto';
+      document.getElementById('cfgThreads').value = st.settings.threads || 8;
+    }
+  } catch {
+    document.getElementById('statusPill').textContent = 'Błąd połączenia z modelem';
+  }
+  const sc = await fetch('/api/scenarios').then(r=>r.json());
+  SCENARIOS = sc.scenarios || [];
+  const sel = document.getElementById('scenarioSel');
+  sel.innerHTML = SCENARIOS.map(s=>`<option value="${esc(s.id)}">${esc(s.title)}</option>`).join('');
+  if(SCENARIOS.length) loadScenario(SCENARIOS[0].id);
+}
+
+function loadScenario(id){
+  const s = SCENARIOS.find(x=>x.id===id) || SCENARIOS[0];
+  if(!s) return;
+  currentMeta = JSON.parse(JSON.stringify(s.meta || {}));
+  currentMsgs = JSON.parse(JSON.stringify(s.messages || []));
+  renderMessages();
+  runAnalyze();
+}
+
+function renderMessages(){
+  document.getElementById('metaPlace').textContent = currentMeta.miejsce || '—';
+  document.getElementById('metaWeather').textContent = currentMeta.pogoda || '—';
+  const list = document.getElementById('msgList');
+  list.innerHTML = currentMsgs.map((m, idx)=>`
+    <div class="msg-card">
+      <div class="msg-top">
+        <span class="msg-id">${esc(m.id)} · ${esc(m.time)}</span>
+        <span class="msg-src">${esc(m.source)}</span>
+        <button class="msg-del" onclick="removeMsg(${idx})" title="Usuń meldunek">×</button>
+      </div>
+      <div class="msg-txt">${esc(m.text)}</div>
+    </div>`).join('');
+}
+
+function removeMsg(idx){
+  currentMsgs.splice(idx, 1);
+  renderMessages();
+}
+
+function addLiveMessage(){
+  const txt = document.getElementById('newTxt').value.trim();
+  if(!txt) return;
+  const nextId = `M${currentMsgs.length + 1}`;
+  currentMsgs.push({
+    id: nextId,
+    time: document.getElementById('newTime').value.trim() || '--:--',
+    source: document.getElementById('newSrc').value.trim() || 'Meldunek terenowy',
+    text: txt,
+  });
+  document.getElementById('newTxt').value = '';
+  renderMessages();
+  runAnalyze();
+}
+
+async function uploadFile(file){
+  if(!file) return;
+  const fd = new FormData(); fd.append('file', file);
+  const r = await fetch('/api/upload', {method:'POST', body:fd});
+  const d = await r.json();
+  if(d.messages && d.messages.length){
+    currentMsgs = d.messages;
+    currentMeta = {miejsce: file.name, pogoda: 'Raport wgrany z pliku', teren:{}};
+    renderMessages();
+    runAnalyze();
+  }
+}
+
+async function switchModel(key){
+  const pill = document.getElementById('statusPill');
+  pill.textContent = `Przełączam na ${key}…`;
+  try{
+    const r = await fetch('/api/model', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({model:key})});
+    const d = await r.json();
+    pill.textContent = `${d.model} · ${d.device}`;
+  } catch { pill.textContent = 'Błąd przełączania modelu'; }
+}
+
+async function runAnalyze(){
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true; btn.textContent = 'Analizuję…';
+  try{
+    const r = await fetch('/api/analyze', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        messages: currentMsgs,
+        meta: currentMeta,
+        use_slm: document.getElementById('useSlm').checked,
+        model: document.getElementById('modelSel').value
+      })
+    });
+    const d = await r.json();
+    lastReport = d;
+    renderAnalysis(d);
+  } catch(e){
+    alert('Błąd analizy: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Analizuj sytuację';
+  }
+}
+
+function renderAnalysis(d){
+  const a = d.analysis || {};
+  const ass = d.assessment || {};
+  const p = a.profil_zaginionego || {};
+  document.getElementById('latencyBadge').textContent = `${(d.mode||'').toUpperCase()} · ${d.latency_ms||0} ms`;
+
+  const alCls = ass.alarm_level === 'KRYTYCZNY' ? '' : (ass.alarm_level === 'WYSOKI' ? 'wysoki' : 'niski');
+  const riskTags = (ass.risk_factors || []).map(f=>`<span class="rtag">${esc(f)}</span>`).join('');
+  const clustersHtml = (a.klastry_sladow || []).map(cl=>`
+    <div class="cluster">
+      <b>${esc(cl.tytul)}</b> <span style="color:var(--muted)">(${esc((cl.ids||[]).join(', '))})</span>
+      <div class="chips">${(cl.frazy||[]).map(f=>`<span class="chip">${esc(f)}</span>`).join('')}</div>
+      <div style="color:var(--muted)">${esc(cl.uzasadnienie)}</div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12.5px">Brak skorelowanych klastrów śladów.</div>';
+
+  const confHtml = (a.sprzecznosci || []).map(c=>`
+    <div class="conflict">
+      <div class="ctop">[${esc((c.ids||[]).join(' ↔ '))}] ${esc(c.type)}</div>
+      <div>${esc(c.description)}</div>
+    </div>`).join('') || '<div style="color:var(--ok);font-size:12.5px">Brak sprzeczności czasowo-terenowych.</div>';
+
+  document.getElementById('col2').innerHTML = `
+    <div class="alarm ${alCls}">
+      <div class="alarm-top">
+        <span>POZIOM ALARMU: ${esc(ass.alarm_level || 'PODWYŻSZONY')}</span>
+        <span>Złote okno: ${ass.golden_window_min || 90} min</span>
+      </div>
+      <div class="risk-tags">${riskTags || '<span class="rtag">Brak krytycznych ryzyk medycznych</span>'}</div>
+    </div>
+    <div class="card">
+      <h3>Zespolony profil zaginionego</h3>
+      <div class="kv"><b>Osoba:</b> ${esc(p.osoba)}</div>
+      <div class="kv"><b>Ubiór:</b> ${esc(p.ubior)}</div>
+      <div class="kv"><b>Zdrowie:</b> ${esc(p.zdrowie)}</div>
+      <div class="kv"><b>Kierunek:</b> ${esc(p.kierunek)}</div>
+    </div>
+    <div class="card">
+      <h3>Złączone ślady (koreferencja synonimów)</h3>
+      ${clustersHtml}
+    </div>
+    <div class="card">
+      <h3>Wykryte sprzeczności i fałszywe tropy</h3>
+      ${confHtml}
+    </div>`;
+
+  const sectors = ass.sectors || [];
+  const secHtml = sectors.map(s=>{
+    const cls = s.priority === 1 ? 'p1' : (s.priority === 2 ? 'p2' : '');
+    return `<div class="sector ${cls}">
+      <div class="sector-top"><span class="s-code">${esc(s.code)}</span><span class="s-badge">${esc(s.badge)}</span></div>
+      <div class="s-name">${esc(s.name)}</div>
+      <div class="s-reason">${esc(s.reason)}</div>
+    </div>`;
+  }).join('');
+
+  const tlHtml = (a.os_czasu || []).map(ev=>`
+    <div class="timeline-item">
+      <span class="t-time">${esc(ev.time || '--:--')}</span>
+      <div><b>[${esc(ev.id)}]</b> ${esc(ev.event)} <span style="color:var(--muted)">(${esc(ev.confidence)})</span></div>
+    </div>`).join('');
+
+  const qHtml = (a.pytania_do_swiadkow || []).map(q=>`<li>${esc(q)}</li>`).join('');
+
+  document.getElementById('col3').innerHTML = `
+    <div class="card">
+      <h3>Taktyczna siatka sektorów (A1–C2)</h3>
+      <div class="sector-grid">${secHtml}</div>
+    </div>
+    <div class="card">
+      <h3>Oś czasu zdarzeń</h3>
+      ${tlHtml}
+    </div>
+    <div class="card">
+      <h3>Pytania weryfikacyjne dla dyspozytora</h3>
+      <ol class="q-list">${qHtml}</ol>
+    </div>`;
+}
+
+async function exportOrder(){
+  if(!lastReport) return;
+  const r = await fetch('/api/export', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({report: lastReport, meta: currentMeta, messages: currentMsgs})
+  });
+  const d = await r.json();
+  if(d.download_url) window.open(d.download_url, '_blank');
+}
+
+function openSettings(){ document.getElementById('cfgModal').style.display='flex'; }
+function closeSettings(){ document.getElementById('cfgModal').style.display='none'; }
+async function saveSettings(){
+  const btn = document.getElementById('saveCfgBtn'); btn.disabled = true;
+  const r = await fetch('/api/settings', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model: document.getElementById('cfgModel').value,
+      gpu: document.getElementById('cfgGpu').value,
+      threads: parseInt(document.getElementById('cfgThreads').value,10) || 8
+    })
+  });
+  const d = await r.json();
+  document.getElementById('statusPill').textContent = `${d.model} · ${d.device}`;
+  document.getElementById('modelSel').value = d.active_key || 'bielik';
+  btn.disabled = false; closeSettings();
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,664 @@
+{
+  "results": [
+    {
+      "system": "Regex Baseline (bez SLM)",
+      "n_cases": 16,
+      "coreference_acc": 0.062,
+      "conflict_acc": 0.562,
+      "conflict_f1": 0.364,
+      "medical_risk_acc": 0.75,
+      "sector_top1_acc": 0.812,
+      "avg_latency_ms": 1,
+      "cases": [
+        {
+          "id": "eval_01",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_02",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "B1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_03",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "B2"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_04",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_05",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_06",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_07",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_08",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "B2"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_09",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_10",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_11",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_12",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_13",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_14",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_15",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": false,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        },
+        {
+          "id": "eval_16",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 1
+        }
+      ]
+    },
+    {
+      "system": "Bielik-4.5B-v3.0-Instruct (BPE Fix)",
+      "n_cases": 16,
+      "coreference_acc": 0.75,
+      "conflict_acc": 0.625,
+      "conflict_f1": 0.75,
+      "medical_risk_acc": 0.75,
+      "sector_top1_acc": 0.75,
+      "avg_latency_ms": 15684,
+      "cases": [
+        {
+          "id": "eval_01",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 14597
+        },
+        {
+          "id": "eval_02",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": false,
+          "sector_ok": false,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 12639
+        },
+        {
+          "id": "eval_03",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "B2"
+          ],
+          "latency_ms": 18418
+        },
+        {
+          "id": "eval_04",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 13095
+        },
+        {
+          "id": "eval_05",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 16437
+        },
+        {
+          "id": "eval_06",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 16371
+        },
+        {
+          "id": "eval_07",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 17269
+        },
+        {
+          "id": "eval_08",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 15821
+        },
+        {
+          "id": "eval_09",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 17518
+        },
+        {
+          "id": "eval_10",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 15970
+        },
+        {
+          "id": "eval_11",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 16415
+        },
+        {
+          "id": "eval_12",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 12894
+        },
+        {
+          "id": "eval_13",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 15683
+        },
+        {
+          "id": "eval_14",
+          "coref": false,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 16233
+        },
+        {
+          "id": "eval_15",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 16266
+        },
+        {
+          "id": "eval_16",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 15326
+        }
+      ]
+    },
+    {
+      "system": "Gemma-4-E4B-it",
+      "n_cases": 16,
+      "coreference_acc": 0.938,
+      "conflict_acc": 0.875,
+      "conflict_f1": 0.9,
+      "medical_risk_acc": 0.75,
+      "sector_top1_acc": 0.625,
+      "avg_latency_ms": 46303,
+      "cases": [
+        {
+          "id": "eval_01",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 61134
+        },
+        {
+          "id": "eval_02",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": false,
+          "sector_ok": false,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 64731
+        },
+        {
+          "id": "eval_03",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 59284
+        },
+        {
+          "id": "eval_04",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 56046
+        },
+        {
+          "id": "eval_05",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 53965
+        },
+        {
+          "id": "eval_06",
+          "coref": true,
+          "conflict_ok": false,
+          "pred_conflict": true,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 40691
+        },
+        {
+          "id": "eval_07",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 36451
+        },
+        {
+          "id": "eval_08",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "B2"
+          ],
+          "latency_ms": 31469
+        },
+        {
+          "id": "eval_09",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": false,
+          "sector_ok": false,
+          "top_sectors": [
+            "B1"
+          ],
+          "latency_ms": 47318
+        },
+        {
+          "id": "eval_10",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 36296
+        },
+        {
+          "id": "eval_11",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "B1"
+          ],
+          "latency_ms": 45918
+        },
+        {
+          "id": "eval_12",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 38158
+        },
+        {
+          "id": "eval_13",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 53388
+        },
+        {
+          "id": "eval_14",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": false,
+          "sector_ok": true,
+          "top_sectors": [
+            "A2"
+          ],
+          "latency_ms": 34148
+        },
+        {
+          "id": "eval_15",
+          "coref": false,
+          "conflict_ok": true,
+          "pred_conflict": true,
+          "exp_conflict": true,
+          "med_ok": true,
+          "sector_ok": false,
+          "top_sectors": [
+            "B2"
+          ],
+          "latency_ms": 46336
+        },
+        {
+          "id": "eval_16",
+          "coref": true,
+          "conflict_ok": true,
+          "pred_conflict": false,
+          "exp_conflict": false,
+          "med_ok": true,
+          "sector_ok": true,
+          "top_sectors": [
+            "A1"
+          ],
+          "latency_ms": 35520
+        }
+      ]
+    }
+  ]
+}

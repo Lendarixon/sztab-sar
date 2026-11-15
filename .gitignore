@@ -1,0 +1,7 @@
+models/
+bin/
+tools/_deck.html
+*.log
+*.part
+__pycache__/
+.pytest_cache/
